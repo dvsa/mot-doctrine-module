@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<phpunit
+    bootstrap="./test/Bootstrap.php"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExceptions="true"
+    convertWarningsToExceptions="true"
+    verbose="true"
+    stopOnFailure="false"
+    processIsolation="false"
+    backupGlobals="false"
+>
+    <testsuite name="DvsaDoctrineModule tests">
+        <directory>./test</directory>
+    </testsuite>
+</phpunit>
