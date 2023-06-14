@@ -3,6 +3,13 @@
 This module provides additional doctrine tools and configurations for doctrine
 (including doctrine/cache, DoctrineModule and DoctrineORMModule).
 
+## Installing
+
+The recommended way to install is through [Composer](https://getcomposer.org/).
+```
+composer require dvsa/mot-doctrine-module
+```
+
 ## Cache
 
 ### Cache service alias
@@ -81,3 +88,6 @@ will share the same connection. To disable persistence set `persistent_id` to `n
 **Warning**: Memcached won't complain if it cannot connect to the server. Application will simply not cache
 if wrong parameters were given in the configuration.
 
+## Contributing
+
+Please refer to our [Contribution Guide](/CONTRIBUTING.md).
