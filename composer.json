@@ -6,7 +6,7 @@
     "require": {
         "php": "^8.0",
         "laminas/laminas-servicemanager": "^3.10.0",
-        "doctrine/cache": "1.4.2",
+        "doctrine/cache": "~1.5",
         "laminas/laminas-dependency-plugin": "^2"
     },
     "require-dev": {
