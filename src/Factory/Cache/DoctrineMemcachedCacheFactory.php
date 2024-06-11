@@ -8,7 +8,7 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class DoctrineMemcachedCacheFactory implements FactoryInterface
 {
-    const PERSISTENT_ID = 'MOT';
+    private const PERSISTENT_ID = 'MOT';
 
     private $defaults = [
         'servers' => [
