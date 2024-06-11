@@ -25,6 +25,13 @@
     "scripts": {
         "test": [
             "phpunit"
+        ],
+        "phpcs": [
+            "./vendor/bin/phpcs",
+            "."
+        ],
+        "psalm": [
+            "./vendor/bin/psalm"
         ]
     },
     "config": {
