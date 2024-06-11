@@ -48,7 +48,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
         // Memcached instance will persist across sessions with identifier 'MOT'
         if (!count($memcached->getServerList())) {
             $memcached->addServers($config['servers']);
-            
+
             if (isset($config['options']) && is_array($config['options'])) {
                 $memcached->setOptions($config['options']);
             }
