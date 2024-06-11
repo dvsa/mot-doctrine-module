@@ -15,7 +15,8 @@
         "captainhook/plugin-composer": "^5.3",
         "squizlabs/php_codesniffer": "^3.10",
         "vimeo/psalm": "^5.24",
-        "dvsa/coding-standards": "^2.0"
+        "dvsa/coding-standards": "^2.0",
+        "phpstan/phpstan": "^1.11"
     },
     "autoload": {
         "psr-4": {
@@ -27,11 +28,13 @@
             "phpunit"
         ],
         "phpcs": [
-            "./vendor/bin/phpcs",
-            "."
+            "./vendor/bin/phpcs ."
         ],
         "psalm": [
             "./vendor/bin/psalm"
+        ],
+        "phpstan":[
+            "vendor/bin/phpstan analyse"
         ]
     },
     "config": {
