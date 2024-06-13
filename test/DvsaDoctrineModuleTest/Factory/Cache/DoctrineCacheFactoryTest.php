@@ -61,7 +61,7 @@ class DoctrineCacheFactoryTest extends TestCase
         $serviceManager->expects($this->any())
             ->method('get')
             ->with(call_user_func_array([$this, 'logicalOr'], array_keys($services)))
-            ->will($this->returnCallback(function ($serviceName) use ($services) {
+            ->will($this->returnCallback(function (string $serviceName) use ($services): mixed {
                 return $services[$serviceName];
             }));
 
