@@ -10,11 +10,17 @@ use Laminas\ServiceManager\ServiceManager;
 
 class DoctrineCacheFactoryTest extends TestCase
 {
+    /**
+     * @return void
+     */
     public function testItIsAZendFactory()
     {
         $this->assertInstanceOf(FactoryInterface::class, new DoctrineCacheFactory());
     }
 
+    /**
+     * @return void
+     */
     public function testItReturnsTheConfiguredCache()
     {
         $serviceManager = $this->getServiceManager([
@@ -29,6 +35,9 @@ class DoctrineCacheFactoryTest extends TestCase
         $this->assertSame($filesystemCache, $cache);
     }
 
+    /**
+     * @return void
+     */
     public function testItThrowsAnExceptionIfCacheIsNotConfigured()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -43,7 +52,7 @@ class DoctrineCacheFactoryTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \Laminas\ServiceManager\ServiceManager&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getServiceManager(array $services)
     {

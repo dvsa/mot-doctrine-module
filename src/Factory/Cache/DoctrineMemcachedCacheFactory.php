@@ -10,7 +10,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
 {
     private const PERSISTENT_ID = 'MOT';
 
-    private $defaults = [
+    private array $defaults = [
         'servers' => [
             [
                 'host' => 'localhost',
@@ -22,7 +22,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
     /**
      * @param ContainerInterface $serviceLocator
      *
-     * @return mixed
+     * @return MemcachedCache
      */
     public function create(ContainerInterface $serviceLocator)
     {
@@ -60,7 +60,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
     /**
      * @param ContainerInterface $serviceLocator
      *
-     * @return array|object
+     * @return array
      */
     private function getMemcachedConfig(ContainerInterface $serviceLocator)
     {
@@ -70,6 +70,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
             $config['cache']['memcached']['servers'] = $this->defaults['servers'];
         }
 
+        /** @var array */
         return $config['cache']['memcached'];
     }
 
@@ -77,7 +78,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
      * @param ContainerInterface $container
      * @param string $name
      * @param array|null $args
-     * @return object|void
+     * @return MemcachedCache
      */
     public function __invoke(ContainerInterface $container, $name, array $args = null)
     {

@@ -4,6 +4,7 @@ namespace DvsaDoctrineModuleTest\Factory\Cache;
 
 use Doctrine\Common\Cache\MemcachedCache;
 use DvsaDoctrineModule\Factory\Cache\DoctrineMemcachedCacheFactory;
+use Error;
 use PHPUnit\Framework\TestCase;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\ServiceManager\ServiceManager;
@@ -17,11 +18,17 @@ class DoctrineMemcachedCacheFactoryTest extends TestCase
         }
     }
 
+    /**
+     * @return void
+     */
     public function testItIsAZendFactory()
     {
         $this->assertInstanceOf(FactoryInterface::class, new DoctrineMemcachedCacheFactory());
     }
 
+    /**
+     * @return void
+     */
     public function testItCreatesTheMemcachedCache()
     {
         $serviceManager = $this->getServiceManager([
@@ -37,9 +44,17 @@ class DoctrineMemcachedCacheFactoryTest extends TestCase
         $service = (new DoctrineMemcachedCacheFactory())->create($serviceManager);
 
         $this->assertInstanceOf(MemcachedCache::class, $service);
+
+        if (!($service->getMemcached() instanceof \Memcached)) {
+            throw new Error('Memcahced is null');
+        }
+
         $this->assertSame([['host' => '127.0.0.1', 'port' => 11222, 'type' => 'TCP']], $service->getMemcached()->getServerList());
     }
 
+    /**
+     * @return void
+     */
     public function testItCreatesTheServiceWithDefaults()
     {
         $serviceManager = $this->getServiceManager([
@@ -51,11 +66,16 @@ class DoctrineMemcachedCacheFactoryTest extends TestCase
         $service = (new DoctrineMemcachedCacheFactory())->create($serviceManager);
 
         $this->assertInstanceOf(MemcachedCache::class, $service);
+
+        if (!($service->getMemcached() instanceof \Memcached)) {
+            throw new Error('Memcahced is null');
+        }
+
         $this->assertSame([['host' => 'localhost', 'port' => 11211, 'type' => 'TCP']], $service->getMemcached()->getServerList());
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \Laminas\ServiceManager\ServiceManager&\PHPUnit\Framework\MockObject\MockObject $serviceManager
      */
     private function getServiceManager(array $config)
     {

@@ -14,21 +14,22 @@ class DoctrineCacheFactory implements FactoryInterface
      *
      * @return Cache
      */
-    public function create(ContainerInterface $serviceLocator)
+    public function create(ServiceLocatorInterface $serviceLocator)
     {
+        /** @var Cache */
         return $serviceLocator->get($this->getConfiguredServiceName($serviceLocator));
     }
 
     /**
      * @param ServiceLocatorInterface $serviceLocator
      *
-     * @return Cache
+     * @return string
      */
-    private function getConfiguredServiceName(ContainerInterface $serviceLocator)
+    private function getConfiguredServiceName(ServiceLocatorInterface $serviceLocator)
     {
         $config = $serviceLocator->get('config');
 
-        if (isset($config['cache']['instance'])) {
+        if (isset($config['cache']['instance']) && is_string($config['cache']['instance'])) {
             return $config['cache']['instance'];
         }
 
@@ -37,6 +38,10 @@ class DoctrineCacheFactory implements FactoryInterface
 
     public function __invoke(ContainerInterface $container, $name, array $args = null)
     {
-        return $this->create($container);
+        if ($container instanceof ServiceLocatorInterface) {
+            return $this->create($container);
+        }
+
+        throw new \InvalidArgumentException('$container is of incorrect type');
     }
 }
