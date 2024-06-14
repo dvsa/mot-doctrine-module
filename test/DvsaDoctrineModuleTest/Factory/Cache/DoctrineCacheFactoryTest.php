@@ -11,6 +11,16 @@ use Laminas\ServiceManager\ServiceManager;
 class DoctrineCacheFactoryTest extends TestCase
 {
     /**
+     * @var ?bool
+     */
+    protected $backupStaticAttributes;
+
+    /**
+     * @var ?bool
+     */
+    protected $runTestInSeparateProcess;
+
+    /**
      * @return void
      */
     public function testItIsAZendFactory()

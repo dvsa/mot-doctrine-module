@@ -10,6 +10,16 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class DoctrineMemcacheCacheFactoryTest extends TestCase
 {
+    /**
+     * @var ?bool
+     */
+    protected $backupStaticAttributes;
+
+    /**
+     * @var ?bool
+     */
+    protected $runTestInSeparateProcess;
+
     public function setUp(): void
     {
         if (!class_exists('Memcache')) {
