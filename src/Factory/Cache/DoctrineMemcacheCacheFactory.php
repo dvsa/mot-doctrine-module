@@ -49,7 +49,12 @@ class DoctrineMemcacheCacheFactory implements FactoryInterface
     {
         $config = $serviceLocator->get('config');
 
-        if (isset($config['cache']['memcache']['servers'])) {
+        if (
+            is_array($config) &&
+            isset($config['cache']) &&
+            isset($config['cache']['memcache']) &&
+            isset($config['cache']['memcache']['servers'])
+        ) {
             /** @var array */
             return $config['cache']['memcache'];
         }

@@ -29,7 +29,12 @@ class DoctrineCacheFactory implements FactoryInterface
     {
         $config = $serviceLocator->get('config');
 
-        if (isset($config['cache']['instance']) && is_string($config['cache']['instance'])) {
+        if (
+            is_array($config) &&
+            isset($config['cache']) &&
+            isset($config['cache']['instance']) &&
+            is_string($config['cache']['instance'])
+        ) {
             return $config['cache']['instance'];
         }
 

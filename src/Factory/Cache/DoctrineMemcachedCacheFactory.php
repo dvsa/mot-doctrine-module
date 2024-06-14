@@ -65,10 +65,13 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
     private function getMemcachedConfig(ContainerInterface $serviceLocator)
     {
         $config = $serviceLocator->get('config');
-
-        if (!isset($config['cache']['memcached']['servers'])) {
-            $config['cache']['memcached']['servers'] = $this->defaults['servers'];
+        if (!is_array($config)) {
+            $config = [];
         }
+
+        $config['cache'] = $config['cache'] ?? [];
+        $config['cache']['memcached'] = $config['cache']['memcached'] ?? [];
+        $config['cache']['memcached']['servers'] = $config['cache']['memcached']['servers'] ?? $this->defaults['servers'];
 
         /** @var array */
         return $config['cache']['memcached'];
