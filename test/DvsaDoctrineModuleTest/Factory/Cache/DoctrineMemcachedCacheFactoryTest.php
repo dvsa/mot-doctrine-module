@@ -11,6 +11,16 @@ use Laminas\ServiceManager\ServiceManager;
 
 class DoctrineMemcachedCacheFactoryTest extends TestCase
 {
+    /**
+     * @var bool|null
+     */
+    protected $backupStaticAttributes;
+
+    /**
+     * @var bool|null
+     */
+    protected $runTestInSeparateProcess;
+
     public function setUp(): void
     {
         if (!class_exists('Memcached')) {
