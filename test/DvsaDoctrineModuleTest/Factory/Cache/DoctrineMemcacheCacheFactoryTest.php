@@ -10,6 +10,16 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class DoctrineMemcacheCacheFactoryTest extends TestCase
 {
+    /**
+     * @var bool
+     */
+    protected $backupStaticAttributes;
+
+    /**
+     * @var bool
+     */
+    protected $runTestInSeparateProcess;
+
     public function setUp(): void
     {
         if (!class_exists('Memcache')) {
@@ -17,11 +27,17 @@ class DoctrineMemcacheCacheFactoryTest extends TestCase
         }
     }
 
+    /**
+     * @return void
+     */
     public function testItIsAZendFactory()
     {
         $this->assertInstanceOf(FactoryInterface::class, new DoctrineMemcacheCacheFactory());
     }
 
+    /**
+     * @return void
+     */
     public function testItCreatesTheMemcacheCache()
     {
         $serviceManager = $this->getServiceManager([
@@ -37,6 +53,9 @@ class DoctrineMemcacheCacheFactoryTest extends TestCase
         $this->assertInstanceOf(MemcacheCache::class, $service);
     }
 
+    /**
+     * @return void
+     */
     public function testItCreatesTheServiceWithDefaults()
     {
         $serviceManager = $this->getServiceManager([
@@ -51,7 +70,7 @@ class DoctrineMemcacheCacheFactoryTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \Laminas\ServiceManager\ServiceManager&\PHPUnit\Framework\MockObject\MockObject $serviceManager
      */
     private function getServiceManager(array $config)
     {

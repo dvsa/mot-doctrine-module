@@ -8,9 +8,9 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class DoctrineMemcachedCacheFactory implements FactoryInterface
 {
-    const PERSISTENT_ID = 'MOT';
+    private const PERSISTENT_ID = 'MOT';
 
-    private $defaults = [
+    private array $defaults = [
         'servers' => [
             [
                 'host' => 'localhost',
@@ -22,7 +22,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
     /**
      * @param ContainerInterface $serviceLocator
      *
-     * @return mixed
+     * @return MemcachedCache
      */
     public function create(ContainerInterface $serviceLocator)
     {
@@ -48,7 +48,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
         // Memcached instance will persist across sessions with identifier 'MOT'
         if (!count($memcached->getServerList())) {
             $memcached->addServers($config['servers']);
-            
+
             if (isset($config['options']) && is_array($config['options'])) {
                 $memcached->setOptions($config['options']);
             }
@@ -60,16 +60,20 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
     /**
      * @param ContainerInterface $serviceLocator
      *
-     * @return array|object
+     * @return array
      */
     private function getMemcachedConfig(ContainerInterface $serviceLocator)
     {
         $config = $serviceLocator->get('config');
-
-        if (!isset($config['cache']['memcached']['servers'])) {
-            $config['cache']['memcached']['servers'] = $this->defaults['servers'];
+        if (!is_array($config)) {
+            $config = [];
         }
 
+        $config['cache'] = $config['cache'] ?? [];
+        $config['cache']['memcached'] = $config['cache']['memcached'] ?? [];
+        $config['cache']['memcached']['servers'] = $config['cache']['memcached']['servers'] ?? $this->defaults['servers'];
+
+        /** @var array */
         return $config['cache']['memcached'];
     }
 
@@ -77,7 +81,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
      * @param ContainerInterface $container
      * @param string $name
      * @param array|null $args
-     * @return object|void
+     * @return MemcachedCache
      */
     public function __invoke(ContainerInterface $container, $name, array $args = null)
     {

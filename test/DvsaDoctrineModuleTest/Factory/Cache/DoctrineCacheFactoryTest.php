@@ -10,11 +10,27 @@ use Laminas\ServiceManager\ServiceManager;
 
 class DoctrineCacheFactoryTest extends TestCase
 {
+    /**
+     * @var bool
+     */
+    protected $backupStaticAttributes;
+
+    /**
+     * @var bool
+     */
+    protected $runTestInSeparateProcess;
+
+    /**
+     * @return void
+     */
     public function testItIsAZendFactory()
     {
         $this->assertInstanceOf(FactoryInterface::class, new DoctrineCacheFactory());
     }
 
+    /**
+     * @return void
+     */
     public function testItReturnsTheConfiguredCache()
     {
         $serviceManager = $this->getServiceManager([
@@ -29,6 +45,9 @@ class DoctrineCacheFactoryTest extends TestCase
         $this->assertSame($filesystemCache, $cache);
     }
 
+    /**
+     * @return void
+     */
     public function testItThrowsAnExceptionIfCacheIsNotConfigured()
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -43,7 +62,7 @@ class DoctrineCacheFactoryTest extends TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \Laminas\ServiceManager\ServiceManager&\PHPUnit\Framework\MockObject\MockObject
      */
     private function getServiceManager(array $services)
     {
@@ -52,7 +71,7 @@ class DoctrineCacheFactoryTest extends TestCase
         $serviceManager->expects($this->any())
             ->method('get')
             ->with(call_user_func_array([$this, 'logicalOr'], array_keys($services)))
-            ->will($this->returnCallback(function ($serviceName) use ($services) {
+            ->will($this->returnCallback(function (string $serviceName) use ($services): mixed {
                 return $services[$serviceName];
             }));
 

@@ -8,7 +8,7 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class DoctrineMemcacheCacheFactory implements FactoryInterface
 {
-    private $defaults = [
+    private array $defaults = [
         'servers' => [
             [
                 'host' => 'localhost',
@@ -22,7 +22,7 @@ class DoctrineMemcacheCacheFactory implements FactoryInterface
     /**
      * @param ContainerInterface $serviceLocator
      *
-     * @return mixed
+     * @return MemcacheCache
      */
     public function create(ContainerInterface $serviceLocator)
     {
@@ -49,7 +49,13 @@ class DoctrineMemcacheCacheFactory implements FactoryInterface
     {
         $config = $serviceLocator->get('config');
 
-        if (isset($config['cache']['memcache']['servers'])) {
+        if (
+            is_array($config) &&
+            isset($config['cache']) &&
+            isset($config['cache']['memcache']) &&
+            isset($config['cache']['memcache']['servers'])
+        ) {
+            /** @var array */
             return $config['cache']['memcache'];
         }
 
@@ -77,7 +83,7 @@ class DoctrineMemcacheCacheFactory implements FactoryInterface
      * @param ContainerInterface $container
      * @param string $name
      * @param array|null $args
-     * @return object|void
+     * @return MemcacheCache
      */
     public function __invoke(ContainerInterface $container, $name, array $args = null)
     {
