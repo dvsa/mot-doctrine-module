@@ -16,14 +16,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
 
-    steps:
-      - run: sudo composer self-update 2.2.24
-
+  # TODO: MR on dvsa github to add composer version as argument to php tools then replace with using dvsa github actions
   phpstan:
-
     name: PHPStan
     runs-on: ubuntu-latest
 
@@ -38,15 +33,59 @@ jobs:
           coverage: none
           tools: phpstan, composer:v2.2.24
 
-      - name: Install Composer dependancies
+      - name: Install Composer dependencies
         run: composer install --no-progress --no-interaction
 
       - name: Execute PHPStan
         run: phpstan analyze --no-progress
 
-  static:
-    needs: setup
-    uses: dvsa/.github/.github/workflows/php-library-static.yml@v4.0.1
+  php-codesniffer:
+    name: PHP-CodeSniffer
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: php-cs-fixer, phpcs, composer:v2.2.24
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --no-interaction
+
+      - name: Execute PHP CodeSniffer
+        run: phpcs -q
+
+  psalm:
+    name: Psalm
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+          extensions: mbstring, intl, composer:v2.2.24
+          tools: vimeo/psalm
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --no-interaction
+
+      - name: Execute Psalm
+        run: psalm --no-progress --output-format=github --root=${GITHUB_WORKSPACE}
+
+
+#  static:
+#    needs: setup
+#    uses: dvsa/.github/.github/workflows/php-library-static.yml@v4.0.1
 
   test:
     needs: setup
