@@ -37,7 +37,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
      *
      * @return \Memcached
      */
-    private function createMemcached(ContainerInterface $serviceLocator)
+    private function createMemcached(ContainerInterface $serviceLocator): \Memcached
     {
         $config = $this->getMemcachedConfig($serviceLocator);
         $persistentId = array_key_exists('persistent_id', $config) ? $config['persistent_id'] : self::PERSISTENT_ID;
@@ -62,7 +62,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
      *
      * @return array
      */
-    private function getMemcachedConfig(ContainerInterface $serviceLocator)
+    private function getMemcachedConfig(ContainerInterface $serviceLocator): array
     {
         $config = $serviceLocator->get('config');
         if (!is_array($config)) {
@@ -80,10 +80,10 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
     /**
      * @param ContainerInterface $container
      * @param string $name
-     * @param array|null $args
+     * @param array|null $options
      * @return MemcachedCache
      */
-    public function __invoke(ContainerInterface $container, $name, array $args = null)
+    public function __invoke(ContainerInterface $container, $name, array $options = null)
     {
         return $this->create($container);
     }
