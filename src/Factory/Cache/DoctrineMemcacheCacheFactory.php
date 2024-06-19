@@ -2,9 +2,10 @@
 
 namespace DvsaDoctrineModule\Factory\Cache;
 
-use Doctrine\Common\Cache\MemcacheCache;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 
 class DoctrineMemcacheCacheFactory implements FactoryInterface
 {
@@ -22,22 +23,19 @@ class DoctrineMemcacheCacheFactory implements FactoryInterface
     /**
      * @param ContainerInterface $serviceLocator
      *
-     * @return MemcacheCache
+     * @return CacheItemPoolInterface
      */
-    public function create(ContainerInterface $serviceLocator)
+    public function create(ContainerInterface $serviceLocator): CacheItemPoolInterface
     {
         $config = $this->getMemcacheConfig($serviceLocator);
 
-        $memcache = new \Memcache();
+        $memcached = new \Memcached();
         foreach ($config['servers'] as $server) {
             $server = $this->normalizeMemcacheServerConfig($server);
-            $memcache->addServer($server['host'], $server['port'], $server['persistent'], $server['weight']);
+            $memcached->addServer($server['host'], $server['port'], $server['weight']);
         }
 
-        $cache = new MemcacheCache();
-        $cache->setMemcache($memcache);
-
-        return $cache;
+        return new MemcachedAdapter($memcached);
     }
 
     /**
@@ -55,7 +53,6 @@ class DoctrineMemcacheCacheFactory implements FactoryInterface
             isset($config['cache']['memcache']) &&
             isset($config['cache']['memcache']['servers'])
         ) {
-            /** @var array */
             return $config['cache']['memcache'];
         }
 
@@ -67,13 +64,12 @@ class DoctrineMemcacheCacheFactory implements FactoryInterface
      *
      * @return array
      */
-    private function normalizeMemcacheServerConfig($server): array
+    private function normalizeMemcacheServerConfig(array $server): array
     {
         if (!isset($server['host']) || !isset($server['port'])) {
             throw new \InvalidArgumentException('Memcache server needs a host and a port to be configured');
         }
 
-        $server['persistent'] = $server['persistent'] ?? true;
         $server['weight'] = $server['weight'] ?? 1;
 
         return $server;
@@ -82,10 +78,10 @@ class DoctrineMemcacheCacheFactory implements FactoryInterface
     /**
      * @param ContainerInterface $container
      * @param string $requestedName
-     * @param array<string, mixed>|null $options
-     * @return MemcacheCache
+     * @param array|null $options
+     * @return CacheItemPoolInterface
      */
-    public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): CacheItemPoolInterface
     {
         return $this->create($container);
     }

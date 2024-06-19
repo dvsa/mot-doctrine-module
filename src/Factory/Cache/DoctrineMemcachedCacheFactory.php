@@ -2,7 +2,8 @@
 
 namespace DvsaDoctrineModule\Factory\Cache;
 
-use Doctrine\Common\Cache\MemcachedCache;
+use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 use Interop\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
@@ -22,14 +23,13 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
     /**
      * @param ContainerInterface $serviceLocator
      *
-     * @return MemcachedCache
+     * @return CacheItemPoolInterface
      */
-    public function create(ContainerInterface $serviceLocator)
+    public function create(ContainerInterface $serviceLocator): CacheItemPoolInterface
     {
-        $cache = new MemcachedCache();
-        $cache->setMemcached($this->createMemcached($serviceLocator));
-
-        return $cache;
+        return new MemcachedAdapter(
+            $this->createMemcached($serviceLocator),
+        );
     }
 
     /**
@@ -44,8 +44,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
 
         $memcached = new \Memcached($persistentId);
 
-        // only add servers to Memcached list if not already present, as this
-        // Memcached instance will persist across sessions with identifier 'MOT'
+        // only add servers to Memcached list if not already present
         if (!count($memcached->getServerList())) {
             $memcached->addServers($config['servers']);
 
@@ -73,7 +72,6 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
         $config['cache']['memcached'] = $config['cache']['memcached'] ?? [];
         $config['cache']['memcached']['servers'] = $config['cache']['memcached']['servers'] ?? $this->defaults['servers'];
 
-        /** @var array */
         return $config['cache']['memcached'];
     }
 
@@ -81,9 +79,9 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
      * @param ContainerInterface $container
      * @param string $name
      * @param array|null $options
-     * @return MemcachedCache
+     * @return CacheItemPoolInterface
      */
-    public function __invoke(ContainerInterface $container, $name, array $options = null)
+    public function __invoke(ContainerInterface $container, $name, array $options = null): CacheItemPoolInterface
     {
         return $this->create($container);
     }
