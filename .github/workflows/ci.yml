@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'main'
+      - 'test-feature-BL-15047-doctrine-cache'
   pull_request:
     branches:
       - 'main'
