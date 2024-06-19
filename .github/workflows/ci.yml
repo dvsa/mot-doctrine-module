@@ -16,6 +16,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+      - uses: php-actions/composer@v6
+        with:
+          version: 2.2.24
+
   static:
     uses: dvsa/.github/.github/workflows/php-library-static.yml@v4.0.1
 
