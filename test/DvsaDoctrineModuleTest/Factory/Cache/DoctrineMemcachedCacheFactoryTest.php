@@ -56,7 +56,7 @@ class DoctrineMemcachedCacheFactoryTest extends TestCase
         $this->assertInstanceOf(MemcachedCache::class, $service);
 
         if (!($service->getMemcached() instanceof \Memcached)) {
-            throw new Error('Memcahced is null');
+            throw new Error('Memcached is null');
         }
 
         $this->assertSame([['host' => '127.0.0.1', 'port' => 11222, 'type' => 'TCP']], $service->getMemcached()->getServerList());

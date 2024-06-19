@@ -2,9 +2,8 @@
 
 namespace DvsaDoctrineModule\Factory\Cache;
 
-use Psr\Cache\CacheItemPoolInterface;
-use Symfony\Component\Cache\Adapter\MemcachedAdapter;
-use Interop\Container\ContainerInterface;
+use Doctrine\Common\Cache\MemcachedCache;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class DoctrineMemcachedCacheFactory implements FactoryInterface
@@ -23,13 +22,14 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
     /**
      * @param ContainerInterface $serviceLocator
      *
-     * @return CacheItemPoolInterface
+     * @return MemcachedCache
      */
-    public function create(ContainerInterface $serviceLocator): CacheItemPoolInterface
+    public function create(ContainerInterface $serviceLocator)
     {
-        return new MemcachedAdapter(
-            $this->createMemcached($serviceLocator),
-        );
+        $cache = new MemcachedCache();
+        $cache->setMemcached($this->createMemcached($serviceLocator));
+
+        return $cache;
     }
 
     /**
@@ -37,14 +37,15 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
      *
      * @return \Memcached
      */
-    private function createMemcached(ContainerInterface $serviceLocator): \Memcached
+    private function createMemcached(ContainerInterface $serviceLocator)
     {
         $config = $this->getMemcachedConfig($serviceLocator);
         $persistentId = array_key_exists('persistent_id', $config) ? $config['persistent_id'] : self::PERSISTENT_ID;
 
         $memcached = new \Memcached($persistentId);
 
-        // only add servers to Memcached list if not already present
+        // only add servers to Memcached list if not already present, as this
+        // Memcached instance will persist across sessions with identifier 'MOT'
         if (!count($memcached->getServerList())) {
             $memcached->addServers($config['servers']);
 
@@ -61,7 +62,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
      *
      * @return array
      */
-    private function getMemcachedConfig(ContainerInterface $serviceLocator): array
+    private function getMemcachedConfig(ContainerInterface $serviceLocator)
     {
         $config = $serviceLocator->get('config');
         if (!is_array($config)) {
@@ -72,16 +73,17 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
         $config['cache']['memcached'] = $config['cache']['memcached'] ?? [];
         $config['cache']['memcached']['servers'] = $config['cache']['memcached']['servers'] ?? $this->defaults['servers'];
 
+        /** @var array */
         return $config['cache']['memcached'];
     }
 
     /**
      * @param ContainerInterface $container
      * @param string $name
-     * @param array|null $options
-     * @return CacheItemPoolInterface
+     * @param array|null $args
+     * @return MemcachedCache
      */
-    public function __invoke(ContainerInterface $container, $name, array $options = null): CacheItemPoolInterface
+    public function __invoke(ContainerInterface $container, $name, array $args = null): mixed
     {
         return $this->create($container);
     }
