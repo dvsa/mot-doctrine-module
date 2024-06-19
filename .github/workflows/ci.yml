@@ -2,9 +2,11 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - 'main'
   pull_request:
-    branches: [ main ]
+    branches:
+      - 'main'
   schedule:
     - cron: '0 0 * * 1'
 
@@ -14,7 +16,7 @@ concurrency:
 
 jobs:
   static:
-    uses: dvsa/.github/.github/workflows/php-library-static.yml@v3.2.3
+    uses: dvsa/.github/.github/workflows/php-library-static.yml@v4.0.1
 
   test:
     uses: dvsa/.github/.github/workflows/php-library-tests.yml@v3.2.3
