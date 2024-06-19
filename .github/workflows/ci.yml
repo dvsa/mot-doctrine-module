@@ -86,15 +86,34 @@ jobs:
 #  static:
 #    needs: setup
 #    uses: dvsa/.github/.github/workflows/php-library-static.yml@v4.0.1
+  tests:
+    runs-on: ubuntu-latest
 
-  test:
-    uses: dvsa/.github/.github/workflows/php-library-tests.yml@v3.2.3
-    with:
-      php-versions: "[\"8.2\"]"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  security:
-    uses: dvsa/.github/.github/workflows/php-library-security.yml@v3.2.3
-    with:
-      php-versions: "[\"8.2\"]"
-    secrets:
-      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer:v2.2.24
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --optimize-autoloader --no-progress --no-interaction
+
+      - name: Execute tests
+        run: vendor/bin/phpunit
+
+#  test:
+#    uses: dvsa/.github/.github/workflows/php-library-tests.yml@v3.2.3
+#    with:
+#      php-versions: "[\"8.2\"]"
+
+#  security:
+#    uses: dvsa/.github/.github/workflows/php-library-security.yml@v3.2.3
+#    with:
+#      php-versions: "[\"8.2\"]"
+#    secrets:
+#      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
