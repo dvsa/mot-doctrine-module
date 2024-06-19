@@ -88,13 +88,11 @@ jobs:
 #    uses: dvsa/.github/.github/workflows/php-library-static.yml@v4.0.1
 
   test:
-    needs: setup
     uses: dvsa/.github/.github/workflows/php-library-tests.yml@v3.2.3
     with:
       php-versions: "[\"8.2\"]"
 
   security:
-    needs: setup
     uses: dvsa/.github/.github/workflows/php-library-security.yml@v3.2.3
     with:
       php-versions: "[\"8.2\"]"
