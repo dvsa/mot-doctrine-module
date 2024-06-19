@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: composer self-update 2.2.24
+      - run: sudo composer self-update 2.2.24
 
   static:
     uses: dvsa/.github/.github/workflows/php-library-static.yml@v4.0.1
