@@ -2,9 +2,11 @@
 
 namespace DvsaDoctrineModule\Factory\Cache;
 
-use Doctrine\Common\Cache\MemcachedCache;
+use Doctrine\Common\Cache\Cache;
 use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Symfony\Component\Cache\Adapter\MemcachedAdapter;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 
 class DoctrineMemcachedCacheFactory implements FactoryInterface
 {
@@ -22,22 +24,20 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
     /**
      * @param ContainerInterface $serviceLocator
      *
-     * @return MemcachedCache
      */
-    public function create(ContainerInterface $serviceLocator)
+    public function create(ContainerInterface $serviceLocator): Cache
     {
-        $cache = new MemcachedCache();
-        $cache->setMemcached($this->createMemcached($serviceLocator));
-
-        return $cache;
+        $memcachedAdapter = $this->createMemcachedAdapter($serviceLocator);
+        return DoctrineProvider::wrap($memcachedAdapter);
     }
+
 
     /**
      * @param ContainerInterface $serviceLocator
      *
-     * @return \Memcached
+     * @return MemcachedAdapter
      */
-    private function createMemcached(ContainerInterface $serviceLocator)
+    public function createMemcachedAdapter(ContainerInterface $serviceLocator): MemcachedAdapter
     {
         $config = $this->getMemcachedConfig($serviceLocator);
         $persistentId = array_key_exists('persistent_id', $config) ? $config['persistent_id'] : self::PERSISTENT_ID;
@@ -54,7 +54,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
             }
         }
 
-        return $memcached;
+        return new MemcachedAdapter($memcached);
     }
 
     /**
@@ -81,7 +81,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
      * @param ContainerInterface $container
      * @param string $name
      * @param array|null $args
-     * @return MemcachedCache
+     * @return Cache
      */
     public function __invoke(ContainerInterface $container, $name, array $args = null): mixed
     {

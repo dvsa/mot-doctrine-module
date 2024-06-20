@@ -2,22 +2,24 @@
 
 namespace DvsaDoctrineModuleTest\Factory\Cache;
 
-use Doctrine\Common\Cache\MemcachedCache;
+use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use DvsaDoctrineModule\Factory\Cache\DoctrineMemcachedCacheFactory;
 use Error;
 use PHPUnit\Framework\TestCase;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\ServiceManager\ServiceManager;
+use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 
 class DoctrineMemcachedCacheFactoryTest extends TestCase
 {
     /**
-     * @var bool
+     * @var bool|null
      */
     protected $backupStaticAttributes;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     protected $runTestInSeparateProcess;
 
@@ -44,22 +46,28 @@ class DoctrineMemcachedCacheFactoryTest extends TestCase
         $serviceManager = $this->getServiceManager([
             'cache' => [
                 'memcached' => [
-                    'servers' => [['host' => '127.0.0.1', 'port' => 11222]],
-                    'options' => [\Memcached::OPT_HASH => \Memcached::HASH_DEFAULT],
-                    'persistent_id' => null,
+                    'servers' => [['host' => 'localhost', 'port' => 11211, 'type' => 'TCP']]
                 ]
             ]
         ]);
 
-        $service = (new DoctrineMemcachedCacheFactory())->create($serviceManager);
+        $factory = new DoctrineMemcachedCacheFactory();
+        $service = $factory->create($serviceManager);
 
-        $this->assertInstanceOf(MemcachedCache::class, $service);
+        $this->assertInstanceOf(DoctrineProvider::class, $service);
 
-        if (!($service->getMemcached() instanceof \Memcached)) {
+        // Validate the Memcached configuration
+        $memcachedAdapter = $factory->createMemcachedAdapter($serviceManager);
+        $reflectionClass = new \ReflectionClass(MemcachedAdapter::class);
+        $reflectionProperty = $reflectionClass->getProperty('client');
+        $memcached = $reflectionProperty->getValue($memcachedAdapter);
+        $this->assertInstanceOf(\Memcached::class, $memcached);
+
+        if (!($memcached instanceof \Memcached)) {
             throw new Error('Memcached is null');
         }
 
-        $this->assertSame([['host' => '127.0.0.1', 'port' => 11222, 'type' => 'TCP']], $service->getMemcached()->getServerList());
+        $this->assertSame([['host' => 'localhost', 'port' => 11211, 'type' => 'TCP']], $memcached->getServerList());
     }
 
     /**
@@ -73,15 +81,20 @@ class DoctrineMemcachedCacheFactoryTest extends TestCase
             ]
         ]);
 
-        $service = (new DoctrineMemcachedCacheFactory())->create($serviceManager);
+        $factory = new DoctrineMemcachedCacheFactory();
+        $service = $factory->create($serviceManager);
 
-        $this->assertInstanceOf(MemcachedCache::class, $service);
+        $this->assertInstanceOf(Cache::class, $service);
 
-        if (!($service->getMemcached() instanceof \Memcached)) {
-            throw new Error('Memcahced is null');
-        }
+        // Validate the Memcached configuration
+        $memcachedAdapter = $factory->createMemcachedAdapter($serviceManager);
+        $reflectionClass = new \ReflectionClass(MemcachedAdapter::class);
+        $reflectionProperty = $reflectionClass->getProperty('client');
+        $memcached = $reflectionProperty->getValue($memcachedAdapter);
 
-        $this->assertSame([['host' => 'localhost', 'port' => 11211, 'type' => 'TCP']], $service->getMemcached()->getServerList());
+        $this->assertInstanceOf(\Memcached::class, $memcached);
+
+        $this->assertSame([['host' => 'localhost', 'port' => 11211, 'type' => 'TCP']], $memcached->getServerList());
     }
 
     /**

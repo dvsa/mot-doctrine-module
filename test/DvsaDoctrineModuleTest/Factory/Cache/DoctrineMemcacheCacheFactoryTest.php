@@ -2,8 +2,8 @@
 
 namespace DvsaDoctrineModuleTest\Factory\Cache;
 
+use Doctrine\Common\Cache\Cache;
 use DvsaDoctrineModule\Factory\Cache\DoctrineMemcacheCacheFactory;
-use Doctrine\Common\Cache\MemcacheCache;
 use PHPUnit\Framework\TestCase;
 use Laminas\ServiceManager\ServiceManager;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -11,12 +11,12 @@ use Laminas\ServiceManager\Factory\FactoryInterface;
 class DoctrineMemcacheCacheFactoryTest extends TestCase
 {
     /**
-     * @var bool
+     * @var bool|null
      */
     protected $backupStaticAttributes;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     protected $runTestInSeparateProcess;
 
@@ -50,7 +50,7 @@ class DoctrineMemcacheCacheFactoryTest extends TestCase
 
         $service = (new DoctrineMemcacheCacheFactory())->create($serviceManager);
 
-        $this->assertInstanceOf(MemcacheCache::class, $service);
+        $this->assertInstanceOf(Cache::class, $service);
     }
 
     /**
@@ -66,7 +66,7 @@ class DoctrineMemcacheCacheFactoryTest extends TestCase
 
         $service = (new DoctrineMemcacheCacheFactory())->create($serviceManager);
 
-        $this->assertInstanceOf(MemcacheCache::class, $service);
+        $this->assertInstanceOf(Cache::class, $service);
     }
 
     /**

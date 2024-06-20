@@ -11,12 +11,12 @@ use Laminas\ServiceManager\ServiceManager;
 class DoctrineCacheFactoryTest extends TestCase
 {
     /**
-     * @var bool
+     * @var bool|null
      */
     protected $backupStaticAttributes;
 
     /**
-     * @var bool
+     * @var bool|null
      */
     protected $runTestInSeparateProcess;
 
