@@ -46,7 +46,7 @@ class DoctrineMemcachedCacheFactoryTest extends TestCase
         $serviceManager = $this->getServiceManager([
             'cache' => [
                 'memcached' => [
-                    'servers' => [['host' => 'localhost', 'port' => 11211, 'type' => 'TCP']],
+                    'servers' => [['host' => '127.0.0.1', 'port' => 11211]],
                     'options' => [\Memcached::OPT_HASH => \Memcached::HASH_DEFAULT],
                     'persistent_id' => null,
                 ]
@@ -69,7 +69,7 @@ class DoctrineMemcachedCacheFactoryTest extends TestCase
             throw new Error('Memcached is null');
         }
 
-        $this->assertSame([['host' => 'localhost', 'port' => 11211, 'type' => 'TCP']], $memcached->getServerList());
+        $this->assertSame([['host' => '127.0.0.1', 'port' => 11211, 'type' => 'TCP']], $memcached->getServerList());
     }
 
     /**
