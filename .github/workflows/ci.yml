@@ -21,10 +21,11 @@ jobs:
     with:
       php-version: '8.2'
       composer-version: 'v2.2.24'
+
   test:
     uses: dvsa/.github/.github/workflows/php-tests.yml@v4.1.0
     with:
-      php-version: '8.2'
+      php-versions: "[\"8.2\"]"
       composer-version: 'v2.2.24'
 
 
