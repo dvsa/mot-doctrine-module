@@ -14,7 +14,7 @@ class DoctrineCacheFactory implements FactoryInterface
      *
      * @return Cache
      */
-    public function create(ServiceLocatorInterface $serviceLocator)
+    public function create(ServiceLocatorInterface $serviceLocator): Cache
     {
         /** @var Cache */
         return $serviceLocator->get($this->getConfiguredServiceName($serviceLocator));
@@ -25,7 +25,7 @@ class DoctrineCacheFactory implements FactoryInterface
      *
      * @return string
      */
-    private function getConfiguredServiceName(ServiceLocatorInterface $serviceLocator)
+    private function getConfiguredServiceName(ServiceLocatorInterface $serviceLocator): string
     {
         $config = $serviceLocator->get('config');
 
