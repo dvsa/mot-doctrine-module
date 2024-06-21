@@ -16,131 +16,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
-  # TODO: MR on dvsa github to add composer version as argument to php tools then replace with using dvsa github actions
-  phpstan:
-    name: PHPStan
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          coverage: none
-          tools: phpstan, composer:v2.2.24
-
-      - name: Install Composer dependencies
-        run: composer install --no-progress --no-interaction
-
-      - name: Execute PHPStan
-        run: phpstan analyze --no-progress
-
-  php-codesniffer:
-    name: PHP-CodeSniffer
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          coverage: none
-          tools: php-cs-fixer, phpcs, composer:v2.2.24
-
-      - name: Install Composer dependencies
-        run: composer install --no-progress --no-interaction
-
-      - name: Execute PHP CodeSniffer
-        run: phpcs -q
-
-  psalm:
-    name: Psalm
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          coverage: none
-          extensions: mbstring, intl
-          tools: vimeo/psalm, composer:v2.2.24
-
-      - name: Install Composer dependencies
-        run: composer install --no-progress --no-interaction
-
-      - name: Execute Psalm
-        run: psalm --no-progress --output-format=github --root=${GITHUB_WORKSPACE}
+  static:
+    uses: dvsa/.github/.github/workflows/php-static.yml@v4.1.0
+    with:
+      php-version: '8.2'
+      composer-version: 'v2.2.24'
+  test:
+    uses: dvsa/.github/.github/workflows/php-tests.yml@v4.1.0
+    with:
+      php-version: '8.2'
+      composer-version: 'v2.2.24'
 
 
-#  static:
-#    needs: setup
-#    uses: dvsa/.github/.github/workflows/php-library-static.yml@v4.0.1
-  tests:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-          tools: composer:v2.2.24
-          coverage: none
-
-      - name: Install dependencies
-        run: composer install --optimize-autoloader --no-progress --no-interaction
-
-      - name: Execute tests
-        run: vendor/bin/phpunit
-
-  snyk:
-    runs-on: ubuntu-latest
-    name: Snyk PHP Scan
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: 8.2
-          coverage: none
-          extensions: mbstring
-          tools: composer:v2.2.24
-
-      - name: Run Snyk to check for vulnerabilities
-        uses: snyk/actions/php@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          SEVERITY_THRESHOLD: ${{ format('--severity-threshold={0}', inputs.severity-threshold) || '' }}
-        with:
-          args: --sarif-file-output=snyk.sarif $SEVERITY_THRESHOLD
-#  test:
-#    uses: dvsa/.github/.github/workflows/php-library-tests.yml@v3.2.3
-#    with:
-#      php-versions: "[\"8.2\"]"
-
-
-#  security:
-#    uses: dvsa/.github/.github/workflows/php-library-security.yml@v3.2.3
-#    with:
-#      php-versions: "[\"8.2\"]"
-#    secrets:
-#      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+  security:
+    uses: dvsa/.github/.github/workflows/php-security.yml@v4.1.0
+    with:
+      php-versions: "[\"8.2\"]"
+    secrets:
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
