@@ -4,6 +4,7 @@ namespace DvsaDoctrineModuleTest\Factory\Cache;
 
 use Doctrine\Common\Cache\Cache;
 use DvsaDoctrineModule\Factory\Cache\DoctrineCacheFactory;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\ServiceManager\ServiceManager;
@@ -23,7 +24,7 @@ class DoctrineCacheFactoryTest extends TestCase
     /**
      * @return void
      */
-    public function testItIsAZendFactory()
+    public function testItIsAZendFactory(): void
     {
         $this->assertInstanceOf(FactoryInterface::class, new DoctrineCacheFactory());
     }
@@ -31,7 +32,7 @@ class DoctrineCacheFactoryTest extends TestCase
     /**
      * @return void
      */
-    public function testItReturnsTheConfiguredCache()
+    public function testItReturnsTheConfiguredCache(): void
     {
         $serviceManager = $this->getServiceManager([
             'config' => [
@@ -48,7 +49,7 @@ class DoctrineCacheFactoryTest extends TestCase
     /**
      * @return void
      */
-    public function testItThrowsAnExceptionIfCacheIsNotConfigured()
+    public function testItThrowsAnExceptionIfCacheIsNotConfigured(): void
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage("No cache driver was configured");
@@ -62,9 +63,9 @@ class DoctrineCacheFactoryTest extends TestCase
     }
 
     /**
-     * @return \Laminas\ServiceManager\ServiceManager&\PHPUnit\Framework\MockObject\MockObject
+     * @return ServiceManager&MockObject
      */
-    private function getServiceManager(array $services)
+    private function getServiceManager(array $services): ServiceManager&MockObject
     {
         $serviceManager = $this->createMock(ServiceManager::class);
 

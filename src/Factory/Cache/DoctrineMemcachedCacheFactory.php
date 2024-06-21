@@ -62,7 +62,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
      *
      * @return array
      */
-    private function getMemcachedConfig(ContainerInterface $serviceLocator)
+    private function getMemcachedConfig(ContainerInterface $serviceLocator): array
     {
         $config = $serviceLocator->get('config');
         if (!is_array($config)) {
@@ -79,11 +79,11 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
 
     /**
      * @param ContainerInterface $container
-     * @param string $name
-     * @param array|null $args
+     * @param string $requestedName
+     * @param array|null $options
      * @return Cache
      */
-    public function __invoke(ContainerInterface $container, $name, array $args = null): mixed
+    public function __invoke(ContainerInterface $container, string $requestedName, array $options = null): Cache
     {
         return $this->create($container);
     }

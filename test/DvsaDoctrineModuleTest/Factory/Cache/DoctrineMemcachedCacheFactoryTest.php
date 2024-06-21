@@ -6,6 +6,7 @@ use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use DvsaDoctrineModule\Factory\Cache\DoctrineMemcachedCacheFactory;
 use Error;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\ServiceManager\ServiceManager;
@@ -33,7 +34,7 @@ class DoctrineMemcachedCacheFactoryTest extends TestCase
     /**
      * @return void
      */
-    public function testItIsAZendFactory()
+    public function testItIsAZendFactory(): void
     {
         $this->assertInstanceOf(FactoryInterface::class, new DoctrineMemcachedCacheFactory());
     }
@@ -41,7 +42,7 @@ class DoctrineMemcachedCacheFactoryTest extends TestCase
     /**
      * @return void
      */
-    public function testItCreatesTheMemcachedCache()
+    public function testItCreatesTheMemcachedCache(): void
     {
         $serviceManager = $this->getServiceManager([
             'cache' => [
@@ -75,7 +76,7 @@ class DoctrineMemcachedCacheFactoryTest extends TestCase
     /**
      * @return void
      */
-    public function testItCreatesTheServiceWithDefaults()
+    public function testItCreatesTheServiceWithDefaults(): void
     {
         $serviceManager = $this->getServiceManager([
             'cache' => [
@@ -100,9 +101,9 @@ class DoctrineMemcachedCacheFactoryTest extends TestCase
     }
 
     /**
-     * @return \Laminas\ServiceManager\ServiceManager&\PHPUnit\Framework\MockObject\MockObject $serviceManager
+     * @return ServiceManager&MockObject $serviceManager
      */
-    private function getServiceManager(array $config)
+    private function getServiceManager(array $config): ServiceManager&MockObject
     {
         $serviceManager = $this->createMock(ServiceManager::class);
         $serviceManager->expects($this->any())

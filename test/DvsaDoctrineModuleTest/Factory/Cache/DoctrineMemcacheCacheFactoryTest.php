@@ -4,6 +4,7 @@ namespace DvsaDoctrineModuleTest\Factory\Cache;
 
 use Doctrine\Common\Cache\Cache;
 use DvsaDoctrineModule\Factory\Cache\DoctrineMemcacheCacheFactory;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Laminas\ServiceManager\ServiceManager;
 use Laminas\ServiceManager\Factory\FactoryInterface;
@@ -30,7 +31,7 @@ class DoctrineMemcacheCacheFactoryTest extends TestCase
     /**
      * @return void
      */
-    public function testItIsAZendFactory()
+    public function testItIsAZendFactory(): void
     {
         $this->assertInstanceOf(FactoryInterface::class, new DoctrineMemcacheCacheFactory());
     }
@@ -38,7 +39,7 @@ class DoctrineMemcacheCacheFactoryTest extends TestCase
     /**
      * @return void
      */
-    public function testItCreatesTheMemcacheCache()
+    public function testItCreatesTheMemcacheCache(): void
     {
         $serviceManager = $this->getServiceManager([
             'cache' => [
@@ -56,7 +57,7 @@ class DoctrineMemcacheCacheFactoryTest extends TestCase
     /**
      * @return void
      */
-    public function testItCreatesTheServiceWithDefaults()
+    public function testItCreatesTheServiceWithDefaults(): void
     {
         $serviceManager = $this->getServiceManager([
             'cache' => [
@@ -70,9 +71,9 @@ class DoctrineMemcacheCacheFactoryTest extends TestCase
     }
 
     /**
-     * @return \Laminas\ServiceManager\ServiceManager&\PHPUnit\Framework\MockObject\MockObject $serviceManager
+     * @return ServiceManager&MockObject $serviceManager
      */
-    private function getServiceManager(array $config)
+    private function getServiceManager(array $config): ServiceManager&MockObject
     {
         $serviceManager = $this->createMock(ServiceManager::class);
         $serviceManager->expects($this->any())
