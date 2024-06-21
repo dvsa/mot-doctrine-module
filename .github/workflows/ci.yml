@@ -32,6 +32,6 @@ jobs:
   security:
     uses: dvsa/.github/.github/workflows/php-security.yml@v4.1.0
     with:
-      php-versions: "[\"8.2\"]"
+      php-version: '8.2'
     secrets:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
