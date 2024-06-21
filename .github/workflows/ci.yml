@@ -133,7 +133,7 @@ jobs:
         with:
           args: --sarif-file-output=snyk.sarif $SEVERITY_THRESHOLD
   static-test:
-    uses: ./.github/workflows/php-static.yml
+    uses: dvsa/.github/.github/workflows/php-static.yml@v4.1.0
     with:
       php-version: '8.2'
       composer-version: 'v2.2.24'
