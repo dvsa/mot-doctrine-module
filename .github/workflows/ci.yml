@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - 'main'
-      - 'test-feature-BL-15047-doctrine-cache'
+      - 'test-gh-action'
   pull_request:
     branches:
       - 'main'
@@ -132,10 +132,11 @@ jobs:
           SEVERITY_THRESHOLD: ${{ format('--severity-threshold={0}', inputs.severity-threshold) || '' }}
         with:
           args: --sarif-file-output=snyk.sarif $SEVERITY_THRESHOLD
-#  test:
-#    uses: dvsa/.github/.github/workflows/php-library-tests.yml@v3.2.3
-#    with:
-#      php-versions: "[\"8.2\"]"
+  static-test:
+    uses: ./.github/workflows/php-static.yml
+    with:
+      php-version: '8.2'
+      composer-version: 'v2.2.24'
 
 
 #  security:
