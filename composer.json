@@ -9,7 +9,7 @@
         "doctrine/cache": "^1.5",
         "laminas/laminas-dependency-plugin": "^2.6.0",
         "ext-memcached": "^3.2",
-        "symfony/cache": "^7.1"
+        "symfony/cache": "^v6.0.0"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.3",
