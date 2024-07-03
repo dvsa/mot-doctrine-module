@@ -41,7 +41,10 @@ class DoctrineCacheFactory implements FactoryInterface
         throw new \InvalidArgumentException('No cache driver was configured');
     }
 
-    public function __invoke(ContainerInterface $container, string $requestedName, array $options = null): Cache
+    /**
+     * @param string $requestedName
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): Cache
     {
         if ($container instanceof ServiceLocatorInterface) {
             return $this->create($container);

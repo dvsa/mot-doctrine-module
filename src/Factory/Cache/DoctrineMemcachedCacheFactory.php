@@ -83,7 +83,7 @@ class DoctrineMemcachedCacheFactory implements FactoryInterface
      * @param array|null $options
      * @return Cache
      */
-    public function __invoke(ContainerInterface $container, string $requestedName, array $options = null): Cache
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): Cache
     {
         return $this->create($container);
     }

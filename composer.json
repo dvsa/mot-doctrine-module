@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
-        "laminas/laminas-servicemanager": "^4.0",
+        "laminas/laminas-servicemanager": "^3.10.0",
         "doctrine/cache": "^2.2",
         "laminas/laminas-dependency-plugin": "^2.6.0",
         "ext-memcached": "^3.2",
