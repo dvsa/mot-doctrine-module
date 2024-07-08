@@ -2,14 +2,25 @@
 
 namespace DvsaDoctrineModuleTest\Factory\Cache;
 
+use Doctrine\Common\Cache\Cache;
 use DvsaDoctrineModule\Factory\Cache\DoctrineMemcacheCacheFactory;
-use Doctrine\Common\Cache\MemcacheCache;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Laminas\ServiceManager\ServiceManager;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 
 class DoctrineMemcacheCacheFactoryTest extends TestCase
 {
+    /**
+     * @var bool|null
+     */
+    protected $backupStaticAttributes;
+
+    /**
+     * @var bool|null
+     */
+    protected $runTestInSeparateProcess;
+
     public function setUp(): void
     {
         if (!class_exists('Memcache')) {
@@ -17,12 +28,18 @@ class DoctrineMemcacheCacheFactoryTest extends TestCase
         }
     }
 
-    public function testItIsAZendFactory()
+    /**
+     * @return void
+     */
+    public function testItIsAZendFactory(): void
     {
         $this->assertInstanceOf(FactoryInterface::class, new DoctrineMemcacheCacheFactory());
     }
 
-    public function testItCreatesTheMemcacheCache()
+    /**
+     * @return void
+     */
+    public function testItCreatesTheMemcacheCache(): void
     {
         $serviceManager = $this->getServiceManager([
             'cache' => [
@@ -34,10 +51,13 @@ class DoctrineMemcacheCacheFactoryTest extends TestCase
 
         $service = (new DoctrineMemcacheCacheFactory())->create($serviceManager);
 
-        $this->assertInstanceOf(MemcacheCache::class, $service);
+        $this->assertInstanceOf(Cache::class, $service);
     }
 
-    public function testItCreatesTheServiceWithDefaults()
+    /**
+     * @return void
+     */
+    public function testItCreatesTheServiceWithDefaults(): void
     {
         $serviceManager = $this->getServiceManager([
             'cache' => [
@@ -47,13 +67,13 @@ class DoctrineMemcacheCacheFactoryTest extends TestCase
 
         $service = (new DoctrineMemcacheCacheFactory())->create($serviceManager);
 
-        $this->assertInstanceOf(MemcacheCache::class, $service);
+        $this->assertInstanceOf(Cache::class, $service);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return ServiceManager&MockObject $serviceManager
      */
-    private function getServiceManager(array $config)
+    private function getServiceManager(array $config): ServiceManager&MockObject
     {
         $serviceManager = $this->createMock(ServiceManager::class);
         $serviceManager->expects($this->any())

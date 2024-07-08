@@ -2,14 +2,28 @@
 
 namespace DvsaDoctrineModuleTest\Factory\Cache;
 
-use Doctrine\Common\Cache\MemcachedCache;
+use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use DvsaDoctrineModule\Factory\Cache\DoctrineMemcachedCacheFactory;
+use Error;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\ServiceManager\ServiceManager;
+use Symfony\Component\Cache\Adapter\MemcachedAdapter;
 
 class DoctrineMemcachedCacheFactoryTest extends TestCase
 {
+    /**
+     * @var bool|null
+     */
+    protected $backupStaticAttributes;
+
+    /**
+     * @var bool|null
+     */
+    protected $runTestInSeparateProcess;
+
     public function setUp(): void
     {
         if (!class_exists('Memcached')) {
@@ -17,30 +31,52 @@ class DoctrineMemcachedCacheFactoryTest extends TestCase
         }
     }
 
-    public function testItIsAZendFactory()
+    /**
+     * @return void
+     */
+    public function testItIsAZendFactory(): void
     {
         $this->assertInstanceOf(FactoryInterface::class, new DoctrineMemcachedCacheFactory());
     }
 
-    public function testItCreatesTheMemcachedCache()
+    /**
+     * @return void
+     */
+    public function testItCreatesTheMemcachedCache(): void
     {
         $serviceManager = $this->getServiceManager([
             'cache' => [
                 'memcached' => [
-                    'servers' => [['host' => '127.0.0.1', 'port' => 11222]],
+                    'servers' => [['host' => '127.0.0.1', 'port' => 11211]],
                     'options' => [\Memcached::OPT_HASH => \Memcached::HASH_DEFAULT],
                     'persistent_id' => null,
                 ]
             ]
         ]);
 
-        $service = (new DoctrineMemcachedCacheFactory())->create($serviceManager);
+        $factory = new DoctrineMemcachedCacheFactory();
+        $service = $factory->create($serviceManager);
 
-        $this->assertInstanceOf(MemcachedCache::class, $service);
-        $this->assertSame([['host' => '127.0.0.1', 'port' => 11222, 'type' => 'TCP']], $service->getMemcached()->getServerList());
+        $this->assertInstanceOf(DoctrineProvider::class, $service);
+
+        // Validate the Memcached configuration
+        $memcachedAdapter = $factory->createMemcachedAdapter($serviceManager);
+        $reflectionClass = new \ReflectionClass(MemcachedAdapter::class);
+        $reflectionProperty = $reflectionClass->getProperty('client');
+        $memcached = $reflectionProperty->getValue($memcachedAdapter);
+        $this->assertInstanceOf(\Memcached::class, $memcached);
+
+        if (!($memcached instanceof \Memcached)) {
+            throw new Error('Memcached is null');
+        }
+
+        $this->assertSame([['host' => '127.0.0.1', 'port' => 11211, 'type' => 'TCP']], $memcached->getServerList());
     }
 
-    public function testItCreatesTheServiceWithDefaults()
+    /**
+     * @return void
+     */
+    public function testItCreatesTheServiceWithDefaults(): void
     {
         $serviceManager = $this->getServiceManager([
             'cache' => [
@@ -48,16 +84,26 @@ class DoctrineMemcachedCacheFactoryTest extends TestCase
             ]
         ]);
 
-        $service = (new DoctrineMemcachedCacheFactory())->create($serviceManager);
+        $factory = new DoctrineMemcachedCacheFactory();
+        $service = $factory->create($serviceManager);
 
-        $this->assertInstanceOf(MemcachedCache::class, $service);
-        $this->assertSame([['host' => 'localhost', 'port' => 11211, 'type' => 'TCP']], $service->getMemcached()->getServerList());
+        $this->assertInstanceOf(Cache::class, $service);
+
+        // Validate the Memcached configuration
+        $memcachedAdapter = $factory->createMemcachedAdapter($serviceManager);
+        $reflectionClass = new \ReflectionClass(MemcachedAdapter::class);
+        $reflectionProperty = $reflectionClass->getProperty('client');
+        $memcached = $reflectionProperty->getValue($memcachedAdapter);
+
+        $this->assertInstanceOf(\Memcached::class, $memcached);
+
+        $this->assertSame([['host' => 'localhost', 'port' => 11211, 'type' => 'TCP']], $memcached->getServerList());
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return ServiceManager&MockObject $serviceManager
      */
-    private function getServiceManager(array $config)
+    private function getServiceManager(array $config): ServiceManager&MockObject
     {
         $serviceManager = $this->createMock(ServiceManager::class);
         $serviceManager->expects($this->any())

@@ -2,13 +2,15 @@
 
 namespace DvsaDoctrineModule\Factory\Cache;
 
-use Doctrine\Common\Cache\MemcacheCache;
-use Interop\Container\ContainerInterface;
+use Doctrine\Common\Cache\Cache;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
+use Symfony\Component\Cache\Adapter\MemcachedAdapter;
+use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 
 class DoctrineMemcacheCacheFactory implements FactoryInterface
 {
-    private $defaults = [
+    private array $defaults = [
         'servers' => [
             [
                 'host' => 'localhost',
@@ -22,22 +24,28 @@ class DoctrineMemcacheCacheFactory implements FactoryInterface
     /**
      * @param ContainerInterface $serviceLocator
      *
-     * @return mixed
      */
-    public function create(ContainerInterface $serviceLocator)
+    public function create(ContainerInterface $serviceLocator): \Doctrine\Common\Cache\Cache
     {
         $config = $this->getMemcacheConfig($serviceLocator);
 
-        $memcache = new \Memcache();
-        foreach ($config['servers'] as $server) {
+        $memcached = MemcachedAdapter::createConnection(
+            $this->getServers($config['servers'])
+        );
+
+        $cache = new MemcachedAdapter($memcached);
+
+        return DoctrineProvider::wrap($cache);
+    }
+
+    private function getServers(array $servers): array
+    {
+        $serverList = [];
+        foreach ($servers as $server) {
             $server = $this->normalizeMemcacheServerConfig($server);
-            $memcache->addServer($server['host'], $server['port'], $server['persistent'], $server['weight']);
+            $serverList[] = [$server['host'], $server['port'], $server['weight']];
         }
-
-        $cache = new MemcacheCache();
-        $cache->setMemcache($memcache);
-
-        return $cache;
+        return $serverList;
     }
 
     /**
@@ -45,11 +53,17 @@ class DoctrineMemcacheCacheFactory implements FactoryInterface
      *
      * @return array
      */
-    private function getMemcacheConfig(ContainerInterface $serviceLocator)
+    private function getMemcacheConfig(ContainerInterface $serviceLocator): array
     {
         $config = $serviceLocator->get('config');
 
-        if (isset($config['cache']['memcache']['servers'])) {
+        if (
+            is_array($config) &&
+            isset($config['cache']) &&
+            isset($config['cache']['memcache']) &&
+            isset($config['cache']['memcache']['servers'])
+        ) {
+            /** @var array */
             return $config['cache']['memcache'];
         }
 
@@ -61,7 +75,7 @@ class DoctrineMemcacheCacheFactory implements FactoryInterface
      *
      * @return array
      */
-    private function normalizeMemcacheServerConfig($server)
+    private function normalizeMemcacheServerConfig($server): array
     {
         if (!isset($server['host']) || !isset($server['port'])) {
             throw new \InvalidArgumentException('Memcache server needs a host and a port to be configured');
@@ -75,11 +89,11 @@ class DoctrineMemcacheCacheFactory implements FactoryInterface
 
     /**
      * @param ContainerInterface $container
-     * @param string $name
-     * @param array|null $args
-     * @return object|void
+     * @param string $requestedName
+     * @param array|null $options
+     * @return Cache
      */
-    public function __invoke(ContainerInterface $container, $name, array $args = null)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): Cache
     {
         return $this->create($container);
     }

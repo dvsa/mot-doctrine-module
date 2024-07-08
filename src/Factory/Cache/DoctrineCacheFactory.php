@@ -3,7 +3,7 @@
 namespace DvsaDoctrineModule\Factory\Cache;
 
 use Doctrine\Common\Cache\Cache;
-use Interop\Container\ContainerInterface;
+use Psr\Container\ContainerInterface;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use Laminas\ServiceManager\ServiceLocatorInterface;
 
@@ -14,29 +14,42 @@ class DoctrineCacheFactory implements FactoryInterface
      *
      * @return Cache
      */
-    public function create(ContainerInterface $serviceLocator)
+    public function create(ServiceLocatorInterface $serviceLocator): Cache
     {
+        /** @var Cache */
         return $serviceLocator->get($this->getConfiguredServiceName($serviceLocator));
     }
 
     /**
      * @param ServiceLocatorInterface $serviceLocator
      *
-     * @return Cache
+     * @return string
      */
-    private function getConfiguredServiceName(ContainerInterface $serviceLocator)
+    private function getConfiguredServiceName(ServiceLocatorInterface $serviceLocator): string
     {
         $config = $serviceLocator->get('config');
 
-        if (isset($config['cache']['instance'])) {
+        if (
+            is_array($config) &&
+            isset($config['cache']) &&
+            isset($config['cache']['instance']) &&
+            is_string($config['cache']['instance'])
+        ) {
             return $config['cache']['instance'];
         }
 
         throw new \InvalidArgumentException('No cache driver was configured');
     }
 
-    public function __invoke(ContainerInterface $container, $name, array $args = null)
+    /**
+     * @param string $requestedName
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = null): Cache
     {
-        return $this->create($container);
+        if ($container instanceof ServiceLocatorInterface) {
+            return $this->create($container);
+        }
+
+        throw new \InvalidArgumentException('$container is of incorrect type');
     }
 }
