@@ -9,11 +9,6 @@ use Laminas\ServiceManager\ServiceLocatorInterface;
 
 class DoctrineCacheFactory implements FactoryInterface
 {
-    /**
-     * @param ServiceLocatorInterface $serviceLocator
-     *
-     * @return Cache
-     */
     public function create(ServiceLocatorInterface $serviceLocator): Cache
     {
         /** @var Cache */
